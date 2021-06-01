@@ -71,21 +71,15 @@ module OmniAuth
         @client_secret ||= begin
           data = "#{options.scope}#{timestamp}#{options.client_id}#{state}"
           file_path = nil
-          s = ""
           begin
-            file = File.open("tmp/_omni/%s" % SecureRandom.urlsafe_base64, "w")
+            file = File.open("tmp/_omni/%s" % state, "w")
             #file = File.open("/home/adm_k0/%s" % state, "w")
             file.write(data)
           ensure
-            file.close unless file.nil?
             file_path = File.absolute_path(file)
-            s = sign_emulator(file_path)
-            p s
+            file.close unless file.nil?
           end
-          #d = Base64.urlsafe_encode64(s)
-          p s
-          p data
-          s
+          sign_emulator(file_path)
         end
       end
 
