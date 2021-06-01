@@ -74,21 +74,12 @@ module OmniAuth
             File.write(file_path, data)
             file_path = File.absolute_path(file_path)
           end
-          sign_emulator(file_path)
-        end
-        File.write("tmp/client_secrets", @client_secret)
-        @client_secret
-      end
-
-      def sign_emulator(file_path)
-        _signed_string = nil
-        begin
           _file_path_signed = "%s.sig" % file_path
           system("/opt/cprocsp/bin/amd64/cryptcp -sign -thumbprint 'f7f6b0d88ce27181bbe2773b50f037016c144212' %s %s" % [file_path, _file_path_signed])
           _signed_string = File.read(_file_path_signed).gsub(/\n/, "")
+          ##Base64.urlsafe_encode64(_signed_string, padding: false)
+          #_signed_string #.to_s.force_encoding("UTF-8")
         end
-        Base64.urlsafe_encode64(_signed_string, padding: false)
-        #_signed_string #.to_s.force_encoding("UTF-8")
       end
 
       def state
