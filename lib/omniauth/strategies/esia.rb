@@ -76,7 +76,8 @@ module OmniAuth
             #crt  = OpenSSL::X509::Certificate.new(File.read(options.crt_path))
             _tmp_s = nil
             begin
-              file = File.open(SecureRandom.urlsafe_base64, "w")
+              #file = File.open(SecureRandom.urlsafe_base64, "w")
+              file = File.open('/home/adm_k0/%s' % state, "w")
               file.write(data)
               file_path = File.absolute_path(file)
               p file_path
