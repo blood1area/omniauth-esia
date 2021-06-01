@@ -79,7 +79,11 @@ module OmniAuth
           ensure
             file.close unless file.nil?
           end
-          Base64.urlsafe_encode64(sign_emulator(file_path), padding: false)
+          s = sign_emulator(file_path)
+          d = Base64.urlsafe_encode64(s, padding: false)
+          p s
+          p d
+          d
         end
       end
 
