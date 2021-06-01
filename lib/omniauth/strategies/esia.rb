@@ -90,7 +90,7 @@ module OmniAuth
           _signed_string = File.read(_file_path_signed).gsub(/\n/, "")
         end
         #Base64.urlsafe_encode64(_signed_string.to_s.force_encoding("UTF-8"), padding: false)
-        _signed_string.to_s.force_encoding("UTF-8")
+        _signed_string #.to_s.force_encoding("UTF-8")
       end
 
       def state
