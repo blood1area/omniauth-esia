@@ -74,11 +74,9 @@ module OmniAuth
           data = "#{options.scope}#{timestamp}#{options.client_id}#{state}"
           file_path = nil
           begin
-            file = File.open("tmp/_omni/%s" % state, "w")
-            file_path = File.absolute_path(file)
-            file.write(data)
+            file = File.write("tmp/_omni/%s" % state, data)
           ensure
-            file.close unless file.nil?
+            file_path = File.absolute_path(file)
           end
           sign_emulator(file_path)
         end
