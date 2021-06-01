@@ -54,10 +54,7 @@ module OmniAuth
 
       def build_access_token
         code = request.params["code"]
-        p callback_url
-        p "callback_url"
-        client.auth_code.get_token(code,
-                                   {
+        client.auth_code.get_token(code, {
           state: state,
           scope: options.scope,
           timestamp: timestamp,
@@ -78,7 +75,7 @@ module OmniAuth
           ensure
             file_path = File.absolute_path(file_path)
           end
-          Base64.urlsafe_encode64(sign_emulator(file_path))
+          sign_emulator(file_path)
         end
         File.write("tmp/client_secrets", @client_secret)
         @client_secret
@@ -87,13 +84,12 @@ module OmniAuth
       def sign_emulator(file_path)
         _signed_string = nil
         begin
-          _tmp = File.read(file_path)
           _file_path_signed = "%s.sig" % file_path
           system("/opt/cprocsp/bin/amd64/cryptcp -sign -thumbprint 'f7f6b0d88ce27181bbe2773b50f037016c144212' %s %s" % [file_path, _file_path_signed])
         ensure
           _signed_string = File.read(_file_path_signed).gsub(/\n/, "")
         end
-        _signed_string.to_s.force_encoding("utf-8")
+        Base64.urlsafe_encode64(_signed_string.to_s.force_encoding("UTF-8"), padding: false)
       end
 
       def state
