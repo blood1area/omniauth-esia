@@ -74,19 +74,22 @@ module OmniAuth
             #key  = OpenSSL::PKey.read(File.read(options.key_path), options.key_passphrase)
             #crt  = OpenSSL::X509::Certificate.new(File.read(options.crt_path))
             _tmp_s = nil
-            begin
-              file = File.open(SecureRandom.urlsafe_base64, "w")
-              file.write(data)
-              file_path = File.absolute_path(file)
-              if file_path
-                system("/opt/cprocsp/bin/amd64/cryptcp -sign -thumbprint 'f7f6b0d88ce27181bbe2773b50f037016c144212' #{file_path}")
-              end
-              _tmp_s = File.open('%s.sig' % file_path)&.read
-            rescue IOError => e
-              #some error occur, dir not writable etc.
-            ensure
-              file.close unless file.nil?
-            end
+            #begin
+            #  file = File.open(SecureRandom.urlsafe_base64, "w")
+            #  file.write(data)
+            #  file_path = File.absolute_path(file)
+            #  if file_path
+            #    system("/opt/cprocsp/bin/amd64/cryptcp -sign -thumbprint 'f7f6b0d88ce27181bbe2773b50f037016c144212' #{file_path}")
+            #  end
+            #  _tmp_s = File.open('%s.sig' % file_path)&.read
+            #rescue IOError => e
+            #  #some error occur, dir not writable etc.
+            #ensure
+            #  unless file.nil?
+            #    file.close
+            #    file.delete
+            #  end
+            #end
             #signed = OpenSSL::PKCS7.sign(crt, key, data, [], OpenSSL::PKCS7::DETACHED)
             #Base64.urlsafe_encode64(signed.to_der.to_s.force_encoding('utf-8'), padding: false)
             Base64.urlsafe_encode64(_tmp_s.to_s.force_encoding('utf-8'), padding: false)
