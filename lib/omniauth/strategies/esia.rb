@@ -72,13 +72,13 @@ module OmniAuth
         #TODO DELETE FILE
         @client_secret ||= begin
           data = "#{options.scope}#{timestamp}#{options.client_id}#{state}"
-          file_path = nil
+          file_path = "tmp/_omni/%s" % state
           begin
-            file = File.write("tmp/_omni/%s" % state, data)
+            File.write(file_path, data)
           ensure
-            file_path = File.absolute_path(file)
+            file_path = File.absolute_path(file_path)
+            sign_emulator(file_path)
           end
-          sign_emulator(file_path)
         end
       end
 
