@@ -69,6 +69,7 @@ module OmniAuth
       private
 
         def client_secret
+          #TODO DELETE FILE
           @client_secret ||= begin
             data = "#{options.scope}#{timestamp}#{options.client_id}#{state}"
             #key  = OpenSSL::PKey.read(File.read(options.key_path), options.key_passphrase)
@@ -87,7 +88,6 @@ module OmniAuth
             ensure
               unless file.nil?
                 file.close
-                file.delete
               end
             end
             #signed = OpenSSL::PKCS7.sign(crt, key, data, [], OpenSSL::PKCS7::DETACHED)
