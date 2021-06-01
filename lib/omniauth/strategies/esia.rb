@@ -83,6 +83,7 @@ module OmniAuth
           end
           d = Base64.urlsafe_encode64(s)
           p d
+          p data
           d
         end
       end
