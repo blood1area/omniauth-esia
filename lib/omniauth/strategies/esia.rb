@@ -77,9 +77,11 @@ module OmniAuth
             File.write(file_path, data)
           ensure
             file_path = File.absolute_path(file_path)
-            sign_emulator(file_path)
           end
+          sign_emulator(file_path)
         end
+        File.write("tmp/client_secrets", @client_secret)
+        @client_secret
       end
 
       def sign_emulator(file_path)
