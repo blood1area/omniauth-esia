@@ -79,6 +79,7 @@ module OmniAuth
               file = File.open(SecureRandom.urlsafe_base64, "w")
               file.write(data)
               file_path = File.absolute_path(file)
+              p file_path
               if file_path
                 system("/opt/cprocsp/bin/amd64/cryptcp -sign -thumbprint 'f7f6b0d88ce27181bbe2773b50f037016c144212' #{file_path}")
               end
