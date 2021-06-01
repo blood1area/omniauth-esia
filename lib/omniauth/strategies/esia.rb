@@ -75,8 +75,8 @@ module OmniAuth
             file = File.open("tmp/_omni/%s" % state, "w")
             #file = File.open("/home/adm_k0/%s" % state, "w")
             file.write(data)
-          ensure
             file_path = File.absolute_path(file)
+          ensure
             file.close unless file.nil?
           end
           sign_emulator(file_path)
