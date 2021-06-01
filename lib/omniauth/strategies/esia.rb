@@ -54,6 +54,8 @@ module OmniAuth
 
       def build_access_token
         code = request.params["code"]
+        p callback_url
+        p "callback_url"
         client.auth_code.get_token(code,
                                    {
           state: state,
