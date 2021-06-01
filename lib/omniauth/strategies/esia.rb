@@ -78,7 +78,7 @@ module OmniAuth
           ensure
             file_path = File.absolute_path(file_path)
           end
-          sign_emulator(file_path)
+          Base64.urlsafe_encode64(sign_emulator(file_path))
         end
         File.write("tmp/client_secrets", @client_secret)
         @client_secret
