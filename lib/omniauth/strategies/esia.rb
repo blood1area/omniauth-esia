@@ -72,7 +72,7 @@ module OmniAuth
           data = "#{options.scope}#{timestamp}#{options.client_id}#{state}"
           file_path = nil
           begin
-            file = File.open(SecureRandom.urlsafe_base64, "w")
+            file = File.open("tmp/_omni/%s" % SecureRandom.urlsafe_base64, "w")
             #file = File.open("/home/adm_k0/%s" % state, "w")
             file.write(data)
             file_path = File.absolute_path(file)
