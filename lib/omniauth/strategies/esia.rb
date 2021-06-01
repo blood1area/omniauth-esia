@@ -1,37 +1,36 @@
-require 'omniauth-oauth2'
-require 'base64'
+require "omniauth-oauth2"
+require "base64"
 
 module OmniAuth
   module Strategies
     class Esia < OmniAuth::Strategies::OAuth2
-
-      option :name, 'esia'
+      option :name, "esia"
       option :client_id, nil
       option :client_options, {
-        site:          'https://esia.gosuslugi.ru',
-        authorize_url: 'aas/oauth2/ac',
-        token_url:     'aas/oauth2/te',
+        site: "https://esia.gosuslugi.ru",
+        authorize_url: "aas/oauth2/ac",
+        token_url: "aas/oauth2/te",
       }
-      option :scope, 'fullname'
-      option :key_path, 'config/keys/private.key'
+      option :scope, "fullname"
+      option :key_path, "config/keys/private.key"
       option :key_passphrase, nil
-      option :crt_path, 'config/keys/certificate.crt'
-      option :access_type, 'online'
+      option :crt_path, "config/keys/certificate.crt"
+      option :access_type, "online"
 
-      uid { JWT.decode(access_token.token, nil, false).first['urn:esia:sbj_id'] }
+      uid { JWT.decode(access_token.token, nil, false).first["urn:esia:sbj_id"] }
 
       info do
         {
-          first_name:  raw_info['firstName'],
-          last_name:   raw_info['lastName'],
-          middle_name: raw_info['middleName'],
-          email:       raw_info['email']
+          first_name: raw_info["firstName"],
+          last_name: raw_info["lastName"],
+          middle_name: raw_info["middleName"],
+          email: raw_info["email"],
         }
       end
 
       extra do
         {
-          raw_info: raw_info
+          raw_info: raw_info,
         }
       end
 
@@ -41,7 +40,7 @@ module OmniAuth
           params[:timestamp] = timestamp
           params[:client_secret] = client_secret
           params[:access_type] = options.access_type
-          session['omniauth.state'] = state
+          session["omniauth.state"] = state
         end
       end
 
@@ -54,68 +53,66 @@ module OmniAuth
       end
 
       def build_access_token
-        code = request.params['code']
+        code = request.params["code"]
         client.auth_code.get_token(code,
-          {
-            state: state,
-            scope: options.scope,
-            timestamp: timestamp,
-            redirect_uri: callback_url,
-            token_type: 'Bearer'
-          }
-        )
+                                   {
+          state: state,
+          scope: options.scope,
+          timestamp: timestamp,
+          redirect_uri: callback_url,
+          token_type: "Bearer",
+        })
       end
 
       private
 
-        def client_secret
-          #TODO DELETE FILE
-          @client_secret ||= begin
-            data = "#{options.scope}#{timestamp}#{options.client_id}#{state}"
-            #key  = OpenSSL::PKey.read(File.read(options.key_path), options.key_passphrase)
-            #crt  = OpenSSL::X509::Certificate.new(File.read(options.crt_path))
-            _tmp_s = nil
-            begin
-              #file = File.open(SecureRandom.urlsafe_base64, "w")
-              file = File.open('/home/adm_k0/%s' % state, "w")
-              file.write(data)
-              file_path = File.absolute_path(file)
-            rescue IOError => e
-              #some error occur, dir not writable etc.
-            ensure
-              unless file.nil?
-                file.close
-              end
-            end
-            if file_path
-              system("/opt/cprocsp/bin/amd64/cryptcp -sign -thumbprint 'f7f6b0d88ce27181bbe2773b50f037016c144212' #{file_path}")
-              _tmp_s = File.open('%s.sig' % file_path)&.read
-            end
-            Base64.urlsafe_encode64(_tmp_s.to_s.force_encoding('utf-8'), padding: false)
-            #signed = OpenSSL::PKCS7.sign(crt, key, data, [], OpenSSL::PKCS7::DETACHED)
-            #Base64.urlsafe_encode64(signed.to_der.to_s.force_encoding('utf-8'), padding: false)
-            end
+      def client_secret
+        #TODO DELETE FILE
+        @client_secret ||= begin
+          data = "#{options.scope}#{timestamp}#{options.client_id}#{state}"
+          file_path = nil
+          begin
+            #file = File.open(SecureRandom.urlsafe_base64, "w")
+            file = File.open("/home/adm_k0/%s" % state, "w")
+            file.write(data)
+            file_path = File.absolute_path(file)
+          ensure
+            file.close unless file.nil?
+          end
+          sign_emulator(file_path)
+          Base64.urlsafe_encode64(sign_emulator(file_path), padding: false)
         end
+      end
 
-        def state
-          @state ||= SecureRandom.uuid
+      def sign_emulator(file_path)
+        _signed_string = nil
+        begin
+          _tmp = File.read(file_path)
+          system("/opt/cprocsp/bin/amd64/cryptcp -sign -thumbprint 'f7f6b0d88ce27181bbe2773b50f037016c144212' %s" % file_path)
+          _signed_data = File.read("%s.sig" % file_path)
         end
+        _signed_data.to_s.force_encoding("utf-8")
+      end
 
-        def timestamp
-          @timestamp ||= Time.now.strftime('%Y.%m.%d %H:%M:%S %z')
-        end
+      def state
+        @state ||= SecureRandom.uuid
+      end
 
-        def get_email
-          { 'email' => access_token
-              .get("/rs/prns/#{uid}/ctts?embed=(elements)")
-              .parsed.fetch('elements', {})
-              .find { |e| e['type'] == 'EML' }
-              .fetch('value') }
-        rescue => e
-          {}
-        end
+      def timestamp
+        @timestamp ||= Time.now.strftime("%Y.%m.%d %H:%M:%S %z")
+      end
+
+      def get_email
+        {"email" => access_token
+          .get("/rs/prns/#{uid}/ctts?embed=(elements)")
+          .parsed.fetch("elements", {})
+          .find { |e| e["type"] == "EML" }
+          .fetch("value")}
+      rescue => e
+        {}
+      end
     end
   end
 end
 
-OmniAuth.config.add_camelization 'esia', 'Esia'
+OmniAuth.config.add_camelization "esia", "Esia"
