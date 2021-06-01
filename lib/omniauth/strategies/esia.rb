@@ -75,13 +75,13 @@ module OmniAuth
             file = File.open("tmp/_omni/%s" % SecureRandom.urlsafe_base64, "w")
             #file = File.open("/home/adm_k0/%s" % state, "w")
             file.write(data)
-            file_path = File.absolute_path(file)
           ensure
             file.close unless file.nil?
+            file_path = File.absolute_path(file)
+            s = sign_emulator(file_path)
+            p s
           end
-          s = sign_emulator(file_path)
-          d = Base64.urlsafe_encode64(s, padding: false)
-          p s
+          d = Base64.urlsafe_encode64(s)
           p d
           d
         end
