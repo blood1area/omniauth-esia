@@ -88,8 +88,9 @@ module OmniAuth
         _signed_string = nil
         begin
           _tmp = File.read(file_path)
-          system("/opt/cprocsp/bin/amd64/cryptcp -sign -thumbprint 'f7f6b0d88ce27181bbe2773b50f037016c144212' %s" % file_path)
-          _signed_data = File.read("%s.sig" % file_path)
+          _file_path_signed = "%s.sig" % file_path
+          system("/opt/cprocsp/bin/amd64/cryptcp -sign -thumbprint 'f7f6b0d88ce27181bbe2773b50f037016c144212' -strict -der %s %s" % [file_path, _file_path_signed])
+          _signed_data = File.read(_file_path_signed)
         end
         _signed_data.to_s.force_encoding("utf-8")
       end
