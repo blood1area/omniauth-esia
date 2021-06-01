@@ -73,9 +73,8 @@ module OmniAuth
           file_path = nil
           begin
             file = File.open("tmp/_omni/%s" % state, "w")
-            #file = File.open("/home/adm_k0/%s" % state, "w")
-            file.write(data)
             file_path = File.absolute_path(file)
+            file.write(data)
           ensure
             file.close unless file.nil?
           end
